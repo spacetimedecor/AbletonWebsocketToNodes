@@ -6,26 +6,25 @@ const config = require("./config");
 Max.removeHandlers();
 
 // Singletons
-const wss = new ws.WebSocketServer({
-  port: config.ServerPort,
-});
+const wss = new ws.WebSocketServer(config.websocketSettings);
 
 let websocketServer;
 
 // Handlers:
-const onMessageFromClient = (data) => {
-  Max.post('Received message from client:', data.toString());
+const onMessageFromClient = (msg) => {
+  const { type, args, meta } = JSON.parse(msg);
+  Max.post('Received message from client:', args);
 }
 
 const onConnection = (server) => {
   websocketServer = server;
   websocketServer.on('message', onMessageFromClient);
   Max.post('New client connected! Saying hello to new client! :)');
-  websocketServer.send('Hello new client, Im the server!');
-}
-
-const onBang = () => {
-  Max.post(JSON.stringify("test"));
+  websocketServer.send(JSON.stringify({
+    type: 'message',
+    args: 'Hello new client, Im the server!',
+    meta: {}
+  }));
 }
 
 const onShutdown = () => {
@@ -33,9 +32,24 @@ const onShutdown = () => {
   wss.close();
 }
 
+const onControl = (...args) => {
+  // Max.post(args);
+  if (websocketServer) {
+    websocketServer.send(JSON.stringify({ type: 'control', args, meta: {} }));
+  }
+}
+
+const onNote = (...args) => {
+  // Max.post(args);
+  if (websocketServer) {
+    websocketServer.send(JSON.stringify({ type: 'note', args, meta: {} }));
+  }
+}
+
 // Events listeners:
 wss.on('connection', onConnection);
-Max.addHandler("bang", onBang);
+Max.addHandler("control", onControl)
+Max.addHandler("note", onNote)
 Max.registerShutdownHook(onShutdown);
 
 

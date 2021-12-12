@@ -1,3 +1,5 @@
 module.exports = {
-  ServerPort: 8080
+  websocketSettings : {
+    port: 8888
+  }
 }
