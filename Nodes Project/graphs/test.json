@@ -5,11 +5,10 @@
   "nodes": [
     {
       "id": "stgbNflIu",
-      "name": "Custom",
+      "name": "Websocket",
       "x": -34,
       "y": -83,
       "templateName": "Custom",
-      "draft": "module.exports = (node, graph) => {\n  let ws;\n\n  node.onReady = () => {\n    ws = new WebSocket(\"ws://localhost:8888\");\n    ws.onopen = () => {\n      console.log('New client connection opened! Saying hello to server.');\n      ws.send(JSON.stringify({ \n        type: 'message', \n        args: 'Hello server! Im new client', \n        meta: {}\n      }));\n    };\n    ws.onmessage = async (msg) => {\n      const { type, args, meta } = JSON.parse(msg.data); \n      console.log(`Server ${type} received:`, args, meta); \n    }\n  };\n\n  node.onDestroy = () => {\n    console.log('Node destroyed');  \n    ws.close();\n    console.log('Socket closed');    \n  };\n};",
       "params": []
     }
   ],

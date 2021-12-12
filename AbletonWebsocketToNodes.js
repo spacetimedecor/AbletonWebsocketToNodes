@@ -1,25 +1,25 @@
 const Max = require('max-api');
 const ws = require('ws');
-const config = require("./config");
+const { websocketSettings, debug } = require("./config");
 
 // Init:
 Max.removeHandlers();
 
 // Singletons
-const wss = new ws.WebSocketServer(config.websocketSettings);
+const wss = new ws.WebSocketServer(websocketSettings);
 
 let websocketServer;
 
 // Handlers:
 const onMessageFromClient = (msg) => {
   const { type, args, meta } = JSON.parse(msg);
-  Max.post('Received message from client:', args);
+  debug && Max.post('Received message from client:', args);
 }
 
 const onConnection = (server) => {
   websocketServer = server;
   websocketServer.on('message', onMessageFromClient);
-  Max.post('New client connected! Saying hello to new client! :)');
+  debug && Max.post('New client connected! Saying hello to new client! :)');
   websocketServer.send(JSON.stringify({
     type: 'message',
     args: 'Hello new client, Im the server!',
@@ -33,14 +33,14 @@ const onShutdown = () => {
 }
 
 const onControl = (...args) => {
-  // Max.post(args);
+  debug && Max.post(args);
   if (websocketServer) {
     websocketServer.send(JSON.stringify({ type: 'control', args, meta: {} }));
   }
 }
 
 const onNote = (...args) => {
-  // Max.post(args);
+  debug && Max.post(args);
   if (websocketServer) {
     websocketServer.send(JSON.stringify({ type: 'note', args, meta: {} }));
   }
