@@ -3,6 +3,7 @@
   "description": "New empty project",
   "private": true,
   "dependencies": {
+    "three": "^0.135.0",
     "ws": "^8.3.0"
   }
 }

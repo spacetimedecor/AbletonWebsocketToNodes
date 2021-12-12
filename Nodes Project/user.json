@@ -21,12 +21,12 @@
     },
     "Websocket": {
       "offset": [
-        0,
-        0
+        -40.69623787105373,
+        -10.178622189544683
       ],
-      "zoomLevel": 1,
+      "zoomLevel": 1.125873726528628,
       "sceneRatio": 0.66,
-      "canvasRatio": 0.5259515570934256,
+      "canvasRatio": 0.46328437917222964,
       "layout": "default"
     }
   }
