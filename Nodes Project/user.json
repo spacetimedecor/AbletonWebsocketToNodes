@@ -1,0 +1,23 @@
+{
+  "theme": "Default",
+  "currentGraph": "test",
+  "editorTheme": "Community Material Theme High Contrast",
+  "editorTabSize": 2,
+  "editorFontSize": 12,
+  "editorMinimap": true,
+  "editorWordWrap": "off",
+  "editorWordWrapColumn": 80,
+  "hideFullscreenGui": false,
+  "graphMetadata": {
+    "test": {
+      "offset": [
+        0,
+        0
+      ],
+      "zoomLevel": 1,
+      "sceneRatio": 0.66,
+      "canvasRatio": 0.5259515570934256,
+      "layout": "default"
+    }
+  }
+}

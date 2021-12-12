@@ -1,0 +1,8 @@
+{
+  "name": "blank2",
+  "description": "New empty project",
+  "private": true,
+  "dependencies": {
+    "ws": "^8.3.0"
+  }
+}

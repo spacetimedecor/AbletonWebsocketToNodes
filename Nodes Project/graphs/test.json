@@ -1,0 +1,17 @@
+{
+  "id": "e1fee0c0-5b3e-11ec-bc65-25db49cff780",
+  "version": "1.0.0-beta.2",
+  "name": "test",
+  "nodes": [
+    {
+      "id": "stgbNflIu",
+      "name": "Custom",
+      "x": -34,
+      "y": -83,
+      "templateName": "Custom",
+      "draft": "module.exports = (node, graph) => {\n  let ws;\n\n  node.onReady = () => {\n    ws = new WebSocket(\"ws://localhost:8080\");\n    ws.onopen = () => {\n      console.log('New client connection opened! Saying hello to server.');\n      ws.send('Hello server! Im new client');\n    };\n    ws.onmessage = (msg) => {\n      console.log('Server message received:', msg.data);  \n      //test\n    }\n  };\n\n  node.onDestroy = () => {\n    console.log('Node destroyed');  \n    ws.close();\n    console.log('Socket closed');    \n  };\n};",
+      "params": []
+    }
+  ],
+  "comments": []
+}
