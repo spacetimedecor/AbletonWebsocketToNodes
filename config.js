@@ -1,6 +1,6 @@
 module.exports = {
   debug: false,
   websocketSettings : {
-    port: 8888
+    port: 1234
   }
 }

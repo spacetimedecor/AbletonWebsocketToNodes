@@ -2,6 +2,9 @@ const Max = require('max-api');
 const ws = require('ws');
 const { websocketSettings, debug } = require("./config");
 
+// If this script does that thing where it tried to run like 5 times of something annoying like that
+// Just comment out everything and bring it in one chunk ata time - I dunno why it works but hey ho
+
 // Init:
 Max.removeHandlers();
 
@@ -48,7 +51,7 @@ const onNote = (...args) => {
 
 // Events listeners:
 wss.on('connection', onConnection);
-Max.addHandler("control", onControl)
+Max.addHandler("control", onControl);
 Max.addHandler("note", onNote)
 Max.registerShutdownHook(onShutdown);
 
