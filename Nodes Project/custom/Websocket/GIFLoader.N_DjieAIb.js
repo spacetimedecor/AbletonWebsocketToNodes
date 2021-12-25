@@ -8,72 +8,38 @@ module.exports = (node, graph) => {
   const { scene, THREE } = graph;
 
   //
+  // STATE
+  //
+  let texture;
+
+  //
   // PORTS
   //
-  const triggerIn = node.triggerIn("in");
   const fileIn = node.in("file", "", { type: "asset", thumbnails: true, connectable: false });
-  const idIn = node.in("id", "test", { connectable: false });
-  const speedIn = node.in(
-    "Speed", 
-    0.5, 
-    { connectable: false, min: 0, max: 10, type: 'number' }
-  ); 
-  const playIn = node.in(
-    "Play", 
-    () => composedTexture?.play(), 
-    { connectable: false }
-  ); 
-  const pauseIn = node.in(
-    "Pause", 
-    () => composedTexture?.pause(), 
-    { connectable: false }
-  );
-  const resumeIn = node.in(
-    "Resume", 
-    () => composedTexture?.resume(), 
-    { connectable: false }
-  );
-  const stopIn = node.in(
-    "Stop", 
-    () => composedTexture?.stop(), 
-    { connectable: false }
-  );
+  const speedIn = node.in("Speed", 0.5, { connectable: false, min: 0, max: 10, type: 'number' }); 
+  const playIn = node.in("Play", () => texture?.play(), { connectable: false }); 
+  const pauseIn = node.in("Pause", () => texture?.pause(), { connectable: false });
+  const resumeIn = node.in("Resume", () => texture?.resume(), { connectable: false });
+  const stopIn = node.in("Stop", () => texture?.stop(), { connectable: false });
+  const autoIn = node.in("Auto", true, { connectable: false })
+  const autoplayIn = node.in("Autoplay", false, { connectable: false });
+  const loopIn = node.in("Loop", false, { connectable: false })
+  const ratioOut = node.triggerOut("Ratio");
   const logIn = node.in(
     "Log", 
-    () => console.log(composedTexture ?? "No texture loaded"), 
+    () => console.log(textureOut.value ?? "No texture loaded"), 
     { connectable: false }
   );
-  const autoIn = node.in(
-    "Auto",
-    true,
-    { connectable: false }
-  )
-  const autoplayIn = node.in(
-    "Autoplay",
-    false,
-    { connectable: false }
-  )
-  const loopIn = node.in(
-    "Loop",
-    false,
-    { connectable: false }
-  )
+
+  const textureOut = node.triggerOut("Texture");
+  const triggerIn = node.triggerIn("In");
+  const playTriggerIn = node.triggerIn("Play Trigger");
+
   //
   // STATE
   //
   const fileLoader = new THREE.FileLoader;
   const clock = new THREE.Clock;
-
-  let composedTexture;
-
-  //
-  // METHODS
-  //
-  const reset = () => {
-    const prevObject = scene.getObjectByName(idIn.value);
-    if (prevObject) scene.remove( prevObject );
-    composedTexture = null;
-  }
 
   const GIFLoader = function( url ) {
       fileLoader.responseType = 'arraybuffer';
@@ -89,7 +55,7 @@ module.exports = (node, graph) => {
         - dims (left, top, width, height)
         - disposalType (number 0-3)
         - delay (number ms)
-        */
+        */ 
 
       const container = {
           downscale: false,	// Canvas needs to be power of 2, by default size is upscaled (false)
@@ -98,52 +64,38 @@ module.exports = (node, graph) => {
           frames: gif.decompressFrames( true )
       };
 
-      reset();
+      ratioOut.trigger(container.width / container.height);
 
-      const ratio      = container.width / container.height;
-      const geometry   = new THREE.PlaneBufferGeometry( 1, 1 );
-      const mesh       = new THREE.Mesh( geometry );
-      composedTexture  = new THREE.ComposedTexture( container );
-      composedTexture.auto = autoIn.value;
-      composedTexture.loop = loopIn.value;
-      composedTexture.autoplay = autoplayIn.value;
-      const material   = new THREE.MeshBasicMaterial({
-        map: composedTexture,
-        transparent: true,
-        alphaTest: 0.5,
-        side: THREE.DoubleSide
-      });
+      texture  = new THREE.ComposedTexture( container );
+      texture.auto = autoIn.value;
+      texture.loop = loopIn.value;
+      texture.autoplay = autoplayIn.value;
 
-      mesh.name = idIn.value;
-      mesh.material = material;
-      mesh.scale.set( 100 * ratio, 100, 1 );
-      mesh.position.set( 0, 50, 0 );
+      await texture.assign( container );
 
-      scene.add( mesh );
+      textureOut.trigger(texture);
     });
   };
-
-  //
-  // MAIN
-  //
-  reset();  
 
   //
   // HANDLERS
   //
   autoIn.onChange = (auto) => {
-    if (!composedTexture) return;
-    composedTexture.auto = auto;
+    if (!texture) return;
+    texture.auto = auto;
+    textureOut.trigger(texture);
   }
 
   autoplayIn.onChange = (autoplay) => {
-    if (!composedTexture) return;
-    composedTexture.autoplay = autoplay;
+    if (!texture) return;
+    texture.autoplay = autoplay;
+    textureOut.trigger(texture);
   }
 
   loopIn.onChange = (loop) => {
-    if (!composedTexture) return;
-    composedTexture.loop = loop;
+    if (!texture) return;
+    texture.loop = loop;
+    textureOut.trigger(texture);
   }
 
   fileIn.onChange = (url) => {
@@ -152,11 +104,15 @@ module.exports = (node, graph) => {
     GIFLoader( url );
   };
 
+  playTriggerIn.onTrigger = (props) => {
+    texture?.play();
+  }
+
   triggerIn.onTrigger = (props) => {
-    if (!composedTexture) return;
-    if (composedTexture.auto) {
+    if (!texture) return;
+    if (texture.auto) {
       const delta = clock.getDelta();
-      composedTexture.update( delta * speedIn.value );
+      texture.update( delta * speedIn.value );
     }
   };
 };

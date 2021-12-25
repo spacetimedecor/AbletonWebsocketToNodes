@@ -1,9 +1,17 @@
 module.exports = (node, graph) => {
+  // Nodes
+  const triggerOut = node.triggerOut("trigger");
+
   // Defaults
   const defaultListeners = {
     default: ({ type, args, meta }) => {
       debug && console.log(`Server ${type} received:`, args, meta);
     },
+    test: ({ type, args, meta }) => {
+      if (type === 'note' && args[1] === 100) {
+        triggerOut.trigger({});
+      }
+    }
   };
 
   // Global settings:

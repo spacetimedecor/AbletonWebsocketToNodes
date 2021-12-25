@@ -17,7 +17,6 @@ module.exports = (node, graph) => {
 
   camera.position.set( 200, 100, 200 );
   camera.lookAt(new THREE.Vector3(0, 50, 0));
-  scene.background = new THREE.Color('blue');
 
 
   //
